@@ -2,7 +2,7 @@
   "name": "gendiff-greybutton",
   "version": "0.0.0",
   "description": "Hexlet project #2",
-  "main": "index.js",
+  "main": "dist/index.js",
   "bin": {
     "gendiff": "dist/bin/gendiff.js"
   },
@@ -11,7 +11,8 @@
     "build": "NODE_ENV=production babel src --out-dir dist --source-maps inline",
     "eslint": "eslint",
     "prepublishOnly": "npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "test:watch": "npm test -- --watchAll"
   },
   "repository": {
     "type": "git",
@@ -34,6 +35,9 @@
     "babel-preset-stage-0": "*",
     "eslint": "^4.17.0",
     "eslint-config-airbnb-base": "*",
-    "eslint-plugin-import": "*"
+    "eslint-plugin-import": "*",
+    "eslint-plugin-jest": "^21.12.1",
+    "jest": "^21",
+    "jest-cli": "^22.3.0"
   }
 }
