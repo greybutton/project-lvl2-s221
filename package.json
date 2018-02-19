@@ -1,0 +1,39 @@
+{
+  "name": "gendiff-greybutton",
+  "version": "0.0.0",
+  "description": "Hexlet project #2",
+  "main": "index.js",
+  "bin": {
+    "gendiff": "dist/bin/gendiff.js"
+  },
+  "scripts": {
+    "babel-node": "babel-node",
+    "build": "NODE_ENV=production babel src --out-dir dist --source-maps inline",
+    "eslint": "eslint",
+    "prepublishOnly": "npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/greybutton/project-lvl2-s221.git"
+  },
+  "author": "Sergej Tabb <greybutton@yandex.com> (https://greybutton.me)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/greybutton/project-lvl2-s221/issues"
+  },
+  "homepage": "https://github.com/greybutton/project-lvl2-s221#readme",
+  "dependencies": {
+    "commander": "^2.14.1"
+  },
+  "devDependencies": {
+    "babel-cli": "*",
+    "babel-core": "*",
+    "babel-eslint": "^8.2.1",
+    "babel-preset-env": "*",
+    "babel-preset-stage-0": "*",
+    "eslint": "^4.17.0",
+    "eslint-config-airbnb-base": "*",
+    "eslint-plugin-import": "*"
+  }
+}
