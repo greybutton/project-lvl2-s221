@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 
 import commander from 'commander';
-import fs from 'fs';
 
 import gendiff from '..';
 
@@ -11,9 +10,7 @@ export default commander
   .arguments('<firstConfig>')
   .arguments('<secondConfig>')
   .option('-f, --format [type]', 'Output format')
-  .action(function (firstConfig, secondConfig) {
-    const first = fs.readFileSync(firstConfig).toString();
-    const second = fs.readFileSync(secondConfig).toString();
-    console.log(gendiff(first, second));
+  .action((firstConfig, secondConfig) => {
+    console.log(gendiff(firstConfig, secondConfig));
   })
   .parse(process.argv);
