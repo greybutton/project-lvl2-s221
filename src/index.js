@@ -59,10 +59,10 @@ const parseConfig = (name, first, second) => {
   };
 };
 
-const diff = (first, second) => {
+const makeDiffObject = (first, second) => {
   const properties = union(Object.keys(first), Object.keys(second));
 
-  const difference = properties.reduce((acc, key) => {
+  const diffObject = properties.reduce((acc, key) => {
     if (first[key] && !second[key]) {
       return { ...acc, [`     - ${key}`]: first[key] };
     } else if (!first[key] && second[key]) {
@@ -75,29 +75,29 @@ const diff = (first, second) => {
     return acc;
   }, {});
 
-  return difference;
+  return diffObject;
 };
 
-const write = (difference) => {
-  const strings = Object.entries(difference).reduce((acc, [key, prop], index) => {
-    if (index === Object.entries(difference).length - 1) {
+const makeDiffString = (diffObject) => {
+  const strings = Object.entries(diffObject).reduce((acc, [key, prop], index) => {
+    if (index === Object.entries(diffObject).length - 1) {
       return `${acc} ${key}: ${prop}`;
     }
     return `${acc} ${key}: ${prop}\n`;
   }, '');
 
-  const result = `{
+  const diffString = `{
       ${strings}
     }
     `;
 
-  return result;
+  return diffString;
 };
 
 export default (firstConfig, secondConfig) => {
   const { name, first, second } = readConfig(firstConfig, secondConfig);
   const { firstObject, secondObject } = parseConfig(name, first, second);
-  const difference = diff(firstObject, secondObject);
-  const result = write(difference);
-  return result;
+  const diffObject = makeDiffObject(firstObject, secondObject);
+  const diffString = makeDiffString(diffObject);
+  return diffString;
 };
