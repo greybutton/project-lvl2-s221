@@ -13,4 +13,4 @@
 LC_ALL=en_US.UTF-8 asciinema rec/auth
 
 [build-badge]: https://img.shields.io/travis/greybutton/project-lvl2-s221.svg?style=flat-square
-[build]: https://travis-ci.org/greybutton/project-lvl2-s221.svg?branch=master
+[build]: https://travis-ci.org/greybutton/project-lvl2-s221
