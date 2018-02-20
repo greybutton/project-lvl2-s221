@@ -2,8 +2,8 @@ import genDiff from '../src';
 
 describe('JSON', () => {
   test('gendiff cmd', () => {
-    const before = '__test__/__fixtures__/before.json';
-    const after = '__test__/__fixtures__/after.json';
+    const before = '__tests__/__fixtures__/before.json';
+    const after = '__tests__/__fixtures__/after.json';
     const received = genDiff(before, after);
     const expected = `{
         host: hexlet.io

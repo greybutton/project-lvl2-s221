@@ -1,9 +1,9 @@
 import genDiff from '../src';
 
-describe('YAML', () => {
+describe('INI', () => {
   test('gendiff cmd', () => {
-    const before = '__test__/__fixtures__/before.yml';
-    const after = '__test__/__fixtures__/after.yml';
+    const before = '__tests__/__fixtures__/before.ini';
+    const after = '__tests__/__fixtures__/after.ini';
     const received = genDiff(before, after);
     const expected = `{
         host: hexlet.io
