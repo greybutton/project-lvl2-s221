@@ -1,6 +1,7 @@
 import path from 'path';
 import fs from 'fs';
 import yaml from 'js-yaml';
+import ini from 'ini';
 import { find, union } from 'lodash';
 
 const configTypes = [
@@ -21,6 +22,12 @@ const configTypes = [
     check: config => path.extname(config) === '.yml',
     read: config => fs.readFileSync(config),
     parse: config => yaml.safeLoad(config),
+  },
+  {
+    name: 'INI',
+    check: config => path.extname(config) === '.ini',
+    read: config => fs.readFileSync(config, 'utf-8'),
+    parse: config => ini.parse(config),
   },
 ];
 

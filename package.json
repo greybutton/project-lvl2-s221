@@ -26,6 +26,7 @@
   "homepage": "https://github.com/greybutton/project-lvl2-s221#readme",
   "dependencies": {
     "commander": "^2.14.1",
+    "ini": "^1.3.5",
     "js-yaml": "^3.10.0",
     "lodash": "^4.17.5"
   },
