@@ -5,10 +5,9 @@ import ini from 'ini';
 import { union } from 'lodash';
 
 const parse = {
-  object: config => config,
-  '.json': config => JSON.parse(config),
-  '.yml': config => yaml.safeLoad(config),
-  '.ini': config => ini.parse(config),
+  '.json': JSON.parse,
+  '.yml': yaml.safeLoad,
+  '.ini': ini.parse,
 };
 
 const readConfig = config =>
@@ -32,16 +31,13 @@ const makeDiffString = (first, second) => {
 };
 
 export default (firstConfig, secondConfig) => {
-  let first = firstConfig;
-  let second = secondConfig;
-  let ext = 'object';
-  if (typeof firstConfig === 'string') {
-    first = readConfig(firstConfig);
-    second = readConfig(secondConfig);
-    ext = path.extname(firstConfig);
-  }
+  const first = readConfig(firstConfig);
+  const second = readConfig(secondConfig);
+  const ext = path.extname(firstConfig);
+
   const firstObject = parse[ext](first);
   const secondObject = parse[ext](second);
   const diffString = makeDiffString(firstObject, secondObject);
+
   return diffString;
 };
