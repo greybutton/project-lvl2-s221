@@ -49,14 +49,14 @@ const makeString = (ast, deep = 1) => {
   };
   const stringify = (obj) => {
     const keys = Object.keys(obj);
-    return `{\n${keys.reduce((acc, key) => `${acc}${padding(deep * deep)}${key}: ${obj[key]}\n`, '')}${padding(deep * deep)}}`;
+    return `{\n${keys.reduce((acc, key) => `${acc}${padding(deep + 2)}${key}: ${obj[key]}\n`, '')}${padding(deep + 1)}}`;
   };
 
   const string = ast.reduce((acc, {
     type, key, value: val, children,
   }) => {
     const operator = operators[type];
-    const child = children ? `${makeString(children, deep + 1)}${padding(deep ** deep)}}\n` : '';
+    const child = children ? `${makeString(children, deep + 1)}${padding(deep + 1)}}\n` : '';
     const value = val instanceof Object ? stringify(val) : val;
 
     return `${acc}${padding(deep)}${operator} ${key}: ${value || '{'}\n${child}`;
