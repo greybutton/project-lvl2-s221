@@ -18,37 +18,50 @@ const makeAst = (first, second) => {
 
   const ast = properties.reduce((acc, key) => {
     if (first[key] instanceof Object && !second[key]) {
-      return [...acc, [key, null, '-', makeAst(first[key], {})]];
+      return [...acc, { type: 'delete', key, value: first[key] }];
     } else if (first[key] instanceof Object && !(second[key] instanceof Object)) {
-      return [...acc, [key, null, '-', makeAst(first[key], {})], [key, second[key], '+']];
+      return [...acc, { type: 'delete', key, value: first[key] }, { type: 'add', key, value: second[key] }];
     } else if (first[key] && !(first[key] instanceof Object) && second[key] instanceof Object) {
-      return [...acc, [key, first[key], '-'], [key, null, '+', makeAst({}, second[key])]];
+      return [...acc, { type: 'delete', key, value: first[key] }, { type: 'add', key, value: second[key] }];
     } else if (!first[key] && second[key] instanceof Object) {
-      return [...acc, [key, null, '+', makeAst({}, second[key])]];
+      return [...acc, { type: 'add', key, value: second[key] }];
     } else if (first[key] instanceof Object && second[key] instanceof Object) {
-      return [...acc, [key, null, ' ', makeAst(first[key], second[key])]];
+      return [...acc, { type: 'nochange', key, children: makeAst(first[key], second[key]) }];
     } else if (first[key] && !second[key]) {
-      return [...acc, [key, first[key], '-']];
+      return [...acc, { type: 'delete', key, value: first[key] }];
     } else if (!first[key] && second[key]) {
-      return [...acc, [key, second[key], '+']];
+      return [...acc, { type: 'add', key, value: second[key] }];
     } else if (first[key] !== second[key]) {
-      return [...acc, [key, second[key], '+'], [key, first[key], '-']];
+      return [...acc, { type: 'add', key, value: second[key] }, { type: 'delete', key, value: first[key] }];
     }
-    return [...acc, [key, first[key], ' ']];
+    return [...acc, { type: 'nochange', key, value: first[key] }];
   }, []);
 
   return ast;
 };
 
 const makeString = (ast, deep = 1) => {
-  const padding = ' '.repeat(6 * deep);
+  const padding = n => ' '.repeat(2 * n);
+  const operators = {
+    add: '+',
+    delete: '-',
+    nochange: ' ',
+  };
+  const stringify = (obj) => {
+    const keys = Object.keys(obj);
+    return `{\n${keys.reduce((acc, key) => `${acc}${padding(deep * deep)}${key}: ${obj[key]}\n`, '')}${padding(deep * deep)}}`;
+  };
 
-  const string = ast.reduce((acc, [key, value, operation, children]) => {
-    const child = children ? `${makeString(children, deep + 1)}${padding}}\n` : '';
-    return `${acc}${padding}${operation} ${key}: ${value || '{'}\n${child}`;
+  const string = ast.reduce((acc, {
+    type, key, value: val, children,
+  }) => {
+    const operator = operators[type];
+    const child = children ? `${makeString(children, deep + 1)}${padding(deep ** deep)}}\n` : '';
+    const value = val instanceof Object ? stringify(val) : val;
+
+    return `${acc}${padding(deep)}${operator} ${key}: ${value || '{'}\n${child}`;
   }, '');
-
-  return `{\n${string}${' '.repeat(4)}}\n${' '.repeat(4)}`;
+  return string;
 };
 
 export default (firstConfig, secondConfig) => {
@@ -62,5 +75,5 @@ export default (firstConfig, secondConfig) => {
   const ast = makeAst(firstObject, secondObject);
   const string = makeString(ast);
 
-  return string;
+  return `{\n${string}}\n`;
 };
