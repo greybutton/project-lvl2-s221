@@ -13,21 +13,42 @@ const parse = {
 const readConfig = config =>
   fs.readFileSync(config, 'utf-8');
 
-const makeDiffString = (first, second) => {
+const makeAst = (first, second) => {
   const properties = union(Object.keys(first), Object.keys(second));
 
-  const diffString = properties.map((key) => {
-    if (first[key] && !second[key]) {
-      return `      - ${key}: ${first[key]}`;
+  const ast = properties.reduce((acc, key) => {
+    if (first[key] instanceof Object && !second[key]) {
+      return [...acc, [key, null, '-', makeAst(first[key], {})]];
+    } else if (first[key] instanceof Object && !(second[key] instanceof Object)) {
+      return [...acc, [key, null, '-', makeAst(first[key], {})], [key, second[key], '+']];
+    } else if (first[key] && !(first[key] instanceof Object) && second[key] instanceof Object) {
+      return [...acc, [key, first[key], '-'], [key, null, '+', makeAst({}, second[key])]];
+    } else if (!first[key] && second[key] instanceof Object) {
+      return [...acc, [key, null, '+', makeAst({}, second[key])]];
+    } else if (first[key] instanceof Object && second[key] instanceof Object) {
+      return [...acc, [key, null, ' ', makeAst(first[key], second[key])]];
+    } else if (first[key] && !second[key]) {
+      return [...acc, [key, first[key], '-']];
     } else if (!first[key] && second[key]) {
-      return `      + ${key}: ${second[key]}`;
+      return [...acc, [key, second[key], '+']];
     } else if (first[key] !== second[key]) {
-      return `      + ${key}: ${second[key]}\n      - ${key}: ${first[key]}`;
+      return [...acc, [key, second[key], '+'], [key, first[key], '-']];
     }
-    return `        ${key}: ${first[key]}`;
-  });
+    return [...acc, [key, first[key], ' ']];
+  }, []);
 
-  return `{\n${diffString.join('\n')}\n    }\n    `;
+  return ast;
+};
+
+const makeString = (ast, deep = 1) => {
+  const padding = ' '.repeat(6 * deep);
+
+  const string = ast.reduce((acc, [key, value, operation, children]) => {
+    const child = children ? `${makeString(children, deep + 1)}${padding}}\n` : '';
+    return `${acc}${padding}${operation} ${key}: ${value || '{'}\n${child}`;
+  }, '');
+
+  return `{\n${string}${' '.repeat(4)}}\n${' '.repeat(4)}`;
 };
 
 export default (firstConfig, secondConfig) => {
@@ -37,7 +58,9 @@ export default (firstConfig, secondConfig) => {
 
   const firstObject = parse[ext](first);
   const secondObject = parse[ext](second);
-  const diffString = makeDiffString(firstObject, secondObject);
 
-  return diffString;
+  const ast = makeAst(firstObject, secondObject);
+  const string = makeString(ast);
+
+  return string;
 };
