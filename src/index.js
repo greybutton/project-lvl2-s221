@@ -51,7 +51,7 @@ export default (firstConfig, secondConfig, format) => {
   const secondObject = parse[ext](second);
 
   const ast = makeAst(firstObject, secondObject);
-  const result = render(format || 'json')(ast);
+  const result = render(format || 'diff')(ast);
 
   return result;
 };
