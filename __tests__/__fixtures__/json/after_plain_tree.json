@@ -1,0 +1,20 @@
+{
+  "timeout": 20,
+  "common": {
+    "setting2": 200,
+    "setting6": {
+      "key": "value"
+    },
+    "sites": {
+      "base": "hexlet.io"
+    }
+  },
+  "group1": {
+      "baz": "bas"
+  },
+  "verbose": true,
+  "group2": {
+    "foo": "bar",
+    "baz": "bars"
+  }
+}

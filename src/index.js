@@ -4,6 +4,8 @@ import yaml from 'js-yaml';
 import ini from 'ini';
 import { union } from 'lodash';
 
+import render from './renderers';
+
 const parse = {
   '.json': JSON.parse,
   '.yml': yaml.safeLoad,
@@ -17,54 +19,30 @@ const makeAst = (first, second) => {
   const properties = union(Object.keys(first), Object.keys(second));
 
   const ast = properties.reduce((acc, key) => {
-    if (first[key] instanceof Object && !second[key]) {
-      return [...acc, { type: 'delete', key, value: first[key] }];
-    } else if (first[key] instanceof Object && !(second[key] instanceof Object)) {
-      return [...acc, { type: 'delete', key, value: first[key] }, { type: 'add', key, value: second[key] }];
-    } else if (first[key] && !(first[key] instanceof Object) && second[key] instanceof Object) {
-      return [...acc, { type: 'delete', key, value: first[key] }, { type: 'add', key, value: second[key] }];
-    } else if (!first[key] && second[key] instanceof Object) {
-      return [...acc, { type: 'add', key, value: second[key] }];
-    } else if (first[key] instanceof Object && second[key] instanceof Object) {
-      return [...acc, { type: 'nochange', key, children: makeAst(first[key], second[key]) }];
+    if (first[key] instanceof Object && second[key] instanceof Object) {
+      return [...acc, { type: 'complex', key, children: makeAst(first[key], second[key]) }];
     } else if (first[key] && !second[key]) {
-      return [...acc, { type: 'delete', key, value: first[key] }];
+      return [...acc, {
+        type: 'delete', key, from: first[key], to: first[key],
+      }];
     } else if (!first[key] && second[key]) {
-      return [...acc, { type: 'add', key, value: second[key] }];
+      return [...acc, {
+        type: 'add', key, from: second[key], to: second[key],
+      }];
     } else if (first[key] !== second[key]) {
-      return [...acc, { type: 'add', key, value: second[key] }, { type: 'delete', key, value: first[key] }];
+      return [...acc, {
+        type: 'update', key, from: first[key], to: second[key],
+      }];
     }
-    return [...acc, { type: 'nochange', key, value: first[key] }];
+    return [...acc, {
+      type: 'nochange', key, from: first[key], to: first[key],
+    }];
   }, []);
 
   return ast;
 };
 
-const makeString = (ast, deep = 1) => {
-  const padding = n => ' '.repeat(2 * n);
-  const operators = {
-    add: '+',
-    delete: '-',
-    nochange: ' ',
-  };
-  const stringify = (obj) => {
-    const keys = Object.keys(obj);
-    return `{\n${keys.reduce((acc, key) => `${acc}${padding(deep + 2)}${key}: ${obj[key]}\n`, '')}${padding(deep + 1)}}`;
-  };
-
-  const string = ast.reduce((acc, {
-    type, key, value: val, children,
-  }) => {
-    const operator = operators[type];
-    const child = children ? `${makeString(children, deep + 1)}${padding(deep + 1)}}\n` : '';
-    const value = val instanceof Object ? stringify(val) : val;
-
-    return `${acc}${padding(deep)}${operator} ${key}: ${value || '{'}\n${child}`;
-  }, '');
-  return string;
-};
-
-export default (firstConfig, secondConfig) => {
+export default (firstConfig, secondConfig, format) => {
   const first = readConfig(firstConfig);
   const second = readConfig(secondConfig);
   const ext = path.extname(firstConfig);
@@ -73,7 +51,7 @@ export default (firstConfig, secondConfig) => {
   const secondObject = parse[ext](second);
 
   const ast = makeAst(firstObject, secondObject);
-  const string = makeString(ast);
+  const result = render(format || 'json')(ast);
 
-  return `{\n${string}}\n`;
+  return result;
 };
