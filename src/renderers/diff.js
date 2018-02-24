@@ -22,23 +22,21 @@ const makeString = (ast, deep = 1) => {
     {
       name: 'add',
       toString: ({
-        type, key, to, children,
+        type, key, to,
       }) => {
         const operator = operators[type];
         const value = getValue(to);
-        const child = children ? `${makeString(children, deep + 1)}${padding(deep + 1)}}\n` : '';
-        return `${padding(deep)}${operator} ${key}: ${value || '{'}\n${child}`;
+        return `${padding(deep)}${operator} ${key}: ${value || '{'}\n`;
       },
     },
     {
       name: 'delete',
       toString: ({
-        type, key, from, children,
+        type, key, from,
       }) => {
         const operator = operators[type];
         const value = getValue(from);
-        const child = children ? `${makeString(children, deep + 1)}${padding(deep + 1)}}\n` : '';
-        return `${padding(deep)}${operator} ${key}: ${value || '{'}\n${child}`;
+        return `${padding(deep)}${operator} ${key}: ${value || '{'}\n`;
       },
     },
     {
