@@ -1,4 +1,4 @@
-Property 'common.setting2' was removed
+Property 'common.setting2' was removed with value: '200'
 Property 'common.setting3' was updated with complex value
 Property 'common.setting6.ops' was added with value: 'vops'
 Property 'common.setting4' was added with value: 'blah blah'

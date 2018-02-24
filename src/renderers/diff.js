@@ -70,4 +70,4 @@ const makeString = (ast, deep = 1) => {
   return string;
 };
 
-export default ast => `{\n${makeString(ast)}}\n`;
+export default ast => `{\n${makeString(ast)}}`;
