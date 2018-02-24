@@ -1,3 +1,5 @@
+import { find } from 'lodash';
+
 const makeString = (ast, deep = 1) => {
   const operators = {
     add: '+',
@@ -16,18 +18,55 @@ const makeString = (ast, deep = 1) => {
 
   const getValue = val => (val instanceof Object ? stringify(val) : val);
 
-  const string = ast.reduce((acc, {
-    type, key, from, to, children,
-  }) => {
-    if (type === 'update') {
-      const valueFrom = getValue(from);
-      const valueTo = getValue(to);
-      return `${acc}${padding(deep)}- ${key}: ${valueFrom}\n${padding(deep)}+ ${key}: ${valueTo}\n`;
-    }
-    const operator = operators[type];
-    const value = getValue(from);
-    const child = children ? `${makeString(children, deep + 1)}${padding(deep + 1)}}\n` : '';
-    return `${acc}${padding(deep)}${operator} ${key}: ${value || '{'}\n${child}`;
+  const handlers = [
+    {
+      name: 'add',
+      toString: ({
+        type, key, to, children,
+      }) => {
+        const operator = operators[type];
+        const value = getValue(to);
+        const child = children ? `${makeString(children, deep + 1)}${padding(deep + 1)}}\n` : '';
+        return `${padding(deep)}${operator} ${key}: ${value || '{'}\n${child}`;
+      },
+    },
+    {
+      name: 'delete',
+      toString: ({
+        type, key, from, children,
+      }) => {
+        const operator = operators[type];
+        const value = getValue(from);
+        const child = children ? `${makeString(children, deep + 1)}${padding(deep + 1)}}\n` : '';
+        return `${padding(deep)}${operator} ${key}: ${value || '{'}\n${child}`;
+      },
+    },
+    {
+      name: 'nochange',
+      toString: ({
+        type, key, from, children,
+      }) => {
+        const operator = operators[type];
+        const value = getValue(from);
+        const child = children ? `${makeString(children, deep + 1)}${padding(deep + 1)}}\n` : '';
+        return `${padding(deep)}${operator} ${key}: ${value || '{'}\n${child}`;
+      },
+    },
+    {
+      name: 'update',
+      toString: ({
+        key, from, to,
+      }) => {
+        const valueFrom = getValue(from);
+        const valueTo = getValue(to);
+        return `${padding(deep)}- ${key}: ${valueFrom}\n${padding(deep)}+ ${key}: ${valueTo}\n`;
+      },
+    },
+  ];
+
+  const string = ast.reduce((acc, node) => {
+    const { toString } = find(handlers, { name: node.type });
+    return `${acc}${toString(node)}`;
   }, '');
 
   return string;

@@ -2,7 +2,7 @@ import path from 'path';
 import fs from 'fs';
 import yaml from 'js-yaml';
 import ini from 'ini';
-import { union } from 'lodash';
+import { union, find } from 'lodash';
 
 import render from './renderers';
 
@@ -18,25 +18,42 @@ const readConfig = config =>
 const makeAst = (first, second) => {
   const properties = union(Object.keys(first), Object.keys(second));
 
-  const ast = properties.reduce((acc, key) => {
-    if (first[key] instanceof Object && second[key] instanceof Object) {
-      return [...acc, { type: 'complex', key, children: makeAst(first[key], second[key]) }];
-    } else if (first[key] && !second[key]) {
-      return [...acc, {
+  const handlers = [
+    {
+      check: key => first[key] instanceof Object && second[key] instanceof Object,
+      node: key => ({
+        type: 'nochange', key, children: makeAst(first[key], second[key]),
+      }),
+    },
+    {
+      check: key => first[key] === second[key],
+      node: key => ({
+        type: 'nochange', key, from: first[key], to: first[key],
+      }),
+    },
+    {
+      check: key => first[key] && !second[key],
+      node: key => ({
         type: 'delete', key, from: first[key], to: first[key],
-      }];
-    } else if (!first[key] && second[key]) {
-      return [...acc, {
+      }),
+    },
+    {
+      check: key => !first[key] && second[key],
+      node: key => ({
         type: 'add', key, from: second[key], to: second[key],
-      }];
-    } else if (first[key] !== second[key]) {
-      return [...acc, {
+      }),
+    },
+    {
+      check: key => first[key] !== second[key],
+      node: key => ({
         type: 'update', key, from: first[key], to: second[key],
-      }];
-    }
-    return [...acc, {
-      type: 'nochange', key, from: first[key], to: first[key],
-    }];
+      }),
+    },
+  ];
+
+  const ast = properties.reduce((acc, key) => {
+    const { node } = find(handlers, ({ check }) => check(key));
+    return [...acc, node(key)];
   }, []);
 
   return ast;
@@ -51,7 +68,7 @@ export default (firstConfig, secondConfig, format) => {
   const secondObject = parse[ext](second);
 
   const ast = makeAst(firstObject, secondObject);
-  const result = render(format || 'diff')(ast);
+  const result = render(format)(ast);
 
   return result;
 };
