@@ -5,7 +5,7 @@ describe('JSON', () => {
   test('flat diff', () => {
     const before = '__tests__/__fixtures__/json/before.json';
     const after = '__tests__/__fixtures__/json/after.json';
-    const received = genDiff(before, after);
+    const received = genDiff(before, after, 'diff');
     const expected = '__tests__/__fixtures__/result_flat_diff.txt';
 
     expect(received).toBe(fs.readFileSync(expected, 'utf-8'));
@@ -14,7 +14,7 @@ describe('JSON', () => {
   test('tree diff', () => {
     const before = '__tests__/__fixtures__/json/before_tree.json';
     const after = '__tests__/__fixtures__/json/after_tree.json';
-    const received = genDiff(before, after);
+    const received = genDiff(before, after, 'diff');
     const expected = '__tests__/__fixtures__/result_tree_diff.txt';
 
     expect(received).toBe(fs.readFileSync(expected, 'utf-8'));
