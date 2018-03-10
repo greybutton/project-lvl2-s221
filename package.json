@@ -4,7 +4,7 @@
   "description": "Hexlet project #2",
   "main": "dist/index.js",
   "bin": {
-    "gendiff": "dist/bin/gendiff.js"
+    "gendiff-greybutton": "dist/bin/gendiff.js"
   },
   "scripts": {
     "babel-node": "babel-node",
