@@ -2,6 +2,26 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/68d794455d2f7b7e82db/maintainability)](https://codeclimate.com/github/greybutton/project-lvl2-s221/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/68d794455d2f7b7e82db/test_coverage)](https://codeclimate.com/github/greybutton/project-lvl2-s221/test_coverage)
 
+## Install 
+
+CLI: `npm install -g gendiff-greybutton`
+
+Module: `npm install --save gendiff-greybutton`
+
+## Use
+
+CLI: `gendiff-greybutton --help`
+
+Module:
+
+```js
+import gendiff from 'gendiff-greybutton';
+
+gendiff(path/to/file/1, path/to/file/2, format);
+```
+
+format: 'diff' is default, 'plain', 'json'
+
 ### Docker
 
 `docker build -t <image-name:tag> .`
