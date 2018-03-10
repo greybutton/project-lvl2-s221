@@ -2,6 +2,8 @@
 [![Maintainability](https://api.codeclimate.com/v1/badges/68d794455d2f7b7e82db/maintainability)](https://codeclimate.com/github/greybutton/project-lvl2-s221/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/68d794455d2f7b7e82db/test_coverage)](https://codeclimate.com/github/greybutton/project-lvl2-s221/test_coverage)
 
+Support: json, yaml, ini
+
 ## Install 
 
 CLI: `npm install -g gendiff-greybutton`
